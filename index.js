@@ -14,12 +14,25 @@ const speechConfig = sdk.SpeechConfig.fromSubscription("6f04f45f094c4662a4aa86b3
 speechConfig.speechRecognitionLanguage = 'he-IL';
 
 app.get('/speechModel/', (req, res) => {
+
+    var dest = 'apple.wav'
+
+    let audioConfig = sdk.AudioConfig.fromWavFileInput(fs.readFileSync(dest));
+            let recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+            recognizer.recognizeOnceAsync(result => {
+                console.log(`RECOGNIZED: Text=${result.text}`);
+                trans = (result.text).toString()
+                trans = trans.slice(0,-1)
+                res.send(trans)
+                recognizer.close();
+    }); 
+
+    /*
     var dest = 'record.wav'
     var url = req.query.recordUrl
     const file = fs.createWriteStream(dest);
     https.get(url, function(response) {
         response.pipe(file);
-        console.log("after pipe")
         file.once('finish', function () {            
             let audioConfig = sdk.AudioConfig.fromWavFileInput(fs.readFileSync(dest));
             let recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
@@ -30,5 +43,7 @@ app.get('/speechModel/', (req, res) => {
             });  
         });
     });
+
+    */
 
 })
